@@ -10,37 +10,14 @@ require 'pstore'
 class Todo 
 	def initialize (title, description, status, owner)
 		@title = title
-		
 		@desc = description
 		@status = status.upcase!
 		@owner = owner
 	end
 
-	def upstatus() 
-		puts "What's the status?"
-		stat = gets.chomp.upcase!
-
-		case stat
-		when "IN PROGRESS"
-			@status = stat
-			puts "task status is: #{@status}"
-		when "COMPLETE"
-			@status = stat
-			puts "Task status is: #{@status}"
-			#TO ADD OTHER CASES
-		else
-			puts "I don't recognize that"
-		end
-	end
 	attr_accessor :title, :owner, :desc, :status
 end
 			
-			
-#cat = Todo.new("task title", "open", "do the thing that needs to be done", "rokk")
-#puts cat.inspect
-#cat.upstatus
-#puts cat.inspect
-
 
 #Create data store
 
@@ -90,8 +67,6 @@ def createtodo
 end
 
 
-#createtodo
-#puts todostore
 def showstore(store)
 	var = 1
 	puts "#" *10
@@ -134,8 +109,6 @@ def delete(store)
 end
 
 
-#showstore(todostore)
-#Update todo status
 
 def start(store)
 	puts "\n" "*****Welcome to Checklist 2200!*****"
@@ -161,11 +134,12 @@ def start(store)
 		if choice == "status"
 			puts "Options: Open, complete, in progress"
 			newinfo = gets.chomp.downcase
-			unless newinfo == "open"
+			unless newinfo == "open" || newinfo == "complete" || newinfo == "in progress" || newinfo == "progress"
 				puts "Invalid entry!"
 				puts "Program has ended."
 				exit(1)
 			end
+			updateStatus(store, task, newinfo)
 			#if newinfo != "open" || newinfo != "complete" || newinfo != "in progress" || newinfo != "progress"
 			#	puts "Invalid entry!"
 			#	puts "Program has ended."
@@ -175,7 +149,8 @@ def start(store)
 			#end
 
 		elsif choice == "title"
-			puts "I will update the title to #{choice}"
+			puts "I will update the title to #{choice}."
+			updateTitle(store, task, newinfo)
 		else
 			puts "Invalid entry!"
 			puts "Program has ended."
@@ -205,11 +180,12 @@ store.transaction(false) do
   	store.roots.each do |asdf|
 		#var = 1
 		if asdf.title == match
-			puts "what should i do?"
 			asdf.title = newinfo
 			puts "The title was updated to: #{newinfo}"
 		else
-			puts "there was no match."
+			puts "I was unable to find the task you were looking for."
+			puts "Please try again."
+			start(store)
 		end
     end
   end
@@ -222,12 +198,24 @@ def updateStatus(store, match, newinfo)
 		#How to do I make it so that once it finds a match, it does 
 		#what it should do and end? Rather than continuing through the array?
 		if asdf.title == match
-			puts "what should i do?"
 			asdf.status = newinfo
 			puts "The status was updated to: #{newinfo}"
 		else
-			puts "there was no match."
+			puts "I was unable to find the task you were looking for."
+			puts "Please try again."
+			start(store)
 		end
+		
+		#unless asdf.title == match
+		#	puts "I was unable to find the task you were looking for."
+		#	puts "Please try again."
+		#end
+		#case asdf.title
+		#when asdf.title == match
+		#	asdf.status = newinfo
+		#else
+			
+		#end
     end
   end
 end
