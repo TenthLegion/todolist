@@ -4,9 +4,6 @@
 
 require 'pstore'
 
-
-#todostore = PStore.new("todolist.pstore")
-#Create todo Class
 class Todo 
 	def initialize (title, description, status, owner)
 		@title = title
@@ -17,52 +14,38 @@ class Todo
 
 	attr_accessor :title, :owner, :desc, :status
 end
-			
-
-#Create data store
-
 
 def savetodo(task, pstore)
-	  #wiki is the name of the Pstore
-	pstore.transaction do  # begin transaction; do all of this or none of it
-	  # store page...
-	  pstore[task] = task
-	  # ensure that an index has been created...
-	  #pstore_name[:wiki_index] ||= Array.new
-	  # update wiki index...
-	  #pstore_name[:wiki_index].push(*add_this.wiki_page_references)
-	  puts "You're task has been saved."
-	end                   # commit changes to wiki data store file
+	pstore.transaction do  
+		pstore[task] = task
+	  	puts "You're task has been saved."
+	end    
 end
 
 
-
-#Create todo
 def createtodo
 	puts "I'll ask you a couple of questions in order to create your todo."
 	puts "What is the title?"
 	print "> "
 	title = gets.chomp
+
 	puts "Input task description:"
 	print "> "
 	desc = gets.chomp
+
 	puts "Status (Open, In Progress, Blocked, or Complete):"
 	print "> "
 	stat = gets.chomp
-		#if stat != "OPEN" || "IN PROGRESS" || "BLOCKED" || "COMPLETE"
-		#	puts "Your status should be one of the following: Open, In Progress, Blocked, or Complete"
-		#	puts "> "
-		#end
+
 	puts "Who is the owner: "
 	print "> "
 	owner = gets.chomp
-	
+
 	p = Todo.new(title, desc, stat, owner)
-	
 	todostore = PStore.new("todolist.pstore")
 	savetodo(p, todostore)
-	
 	puts "\n"
+
 	start(todostore)
 end
 
@@ -76,7 +59,6 @@ def showstore(store)
     		p "Title: " + asdf.title
     		p "Description: " + asdf.desc
     		p "Status: " + asdf.status
-    		#p todostore[data_root_name]
     		puts "#" * 10
     		var += 1
     	end
@@ -104,8 +86,7 @@ def delete(store)
 	else
 		puts "other else"
 		puts "Del was: #{del}"
-	end
-			
+	end			
 end
 
 
@@ -127,12 +108,15 @@ def start(store)
 	when input == "2" || "update"
 		puts "I still need to figure out how to update a task once it's created. Bear with me."
 		puts "What task would you like to update?"
+		print "> "
 		task = gets.chomp.downcase
 		puts "What would you like to update? Title or Status?"
+		print "> "
 		choice = gets.chomp.downcase
 		
 		if choice == "status"
 			puts "Options: Open, complete, in progress"
+			print "> "
 			newinfo = gets.chomp.downcase
 			unless newinfo == "open" || newinfo == "complete" || newinfo == "in progress" || newinfo == "progress"
 				puts "Invalid entry!"
@@ -140,29 +124,17 @@ def start(store)
 				exit(1)
 			end
 			updateStatus(store, task, newinfo)
-			#if newinfo != "open" || newinfo != "complete" || newinfo != "in progress" || newinfo != "progress"
-			#	puts "Invalid entry!"
-			#	puts "Program has ended."
-			#	exit(1)
-			#else
-			#	puts "You choice is: #{newinfo}"
-			#end
-
 		elsif choice == "title"
-			puts "I will update the title to #{choice}."
+			puts "What is the new title?"
+			print "> "
+			newinfo = gets.chomp.downcase
+			puts "I will update the title to #{newinfo}."
 			updateTitle(store, task, newinfo)
 		else
 			puts "Invalid entry!"
 			puts "Program has ended."
 			exit(1)	
 		end
-
-
-				
-
-
-
-
 		return start(store)
 	when input == "3" || "show" || "show tasks" || "tasks"
 		return showstore(store)
@@ -173,49 +145,38 @@ def start(store)
 	end		
 end
 
-#val = "new title given"
 
 def updateTitle(store, match, newinfo)
-store.transaction(false) do  
-  	store.roots.each do |asdf|
-		#var = 1
-		if asdf.title == match
-			asdf.title = newinfo
-			puts "The title was updated to: #{newinfo}"
-		else
-			puts "I was unable to find the task you were looking for."
-			puts "Please try again."
-			start(store)
-		end
-    end
-  end
+	store.transaction(false) do  
+	  	store.roots.each do |task|
+			#var = 1
+			if task.title == match
+				task.title = newinfo
+				puts "The title was updated to: #{newinfo}"
+			else
+				puts "I was unable to find the task you were looking for."
+				puts "Please try again."
+			end
+	    end
+	  end
+	start(store)
 end
 
 
 def updateStatus(store, match, newinfo)
 	store.transaction(false) do  
-  	store.roots.each do |asdf|
+  	store.roots.each do |task|
 		#How to do I make it so that once it finds a match, it does 
 		#what it should do and end? Rather than continuing through the array?
-		if asdf.title == match
-			asdf.status = newinfo
+		if task.title == match
+			task.status = newinfo
 			puts "The status was updated to: #{newinfo}"
 		else
 			puts "I was unable to find the task you were looking for."
 			puts "Please try again."
-			start(store)
-		end
-		
-		#unless asdf.title == match
-		#	puts "I was unable to find the task you were looking for."
-		#	puts "Please try again."
-		#end
-		#case asdf.title
-		#when asdf.title == match
-		#	asdf.status = newinfo
-		#else
 			
-		#end
+		end
     end
   end
+  start(store)
 end
